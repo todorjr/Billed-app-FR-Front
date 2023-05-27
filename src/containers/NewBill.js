@@ -23,7 +23,14 @@ export default class NewBill {
     const fileExtension = fileName.split('.').pop();
 
     if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-      alert('Invalid file type. Please select a jpg, jpeg or png file.');
+      if (['pdf'].includes(fileExtension)) {
+        // Create text under the element indicating it's a PDF file
+        const textElement = document.createElement('p');
+        textElement.textContent = 'This is a PDF file.';
+        textElement.classList.add('file-type-info');
+        textElement.style.color = 'red';
+        e.target.parentNode.appendChild(textElement);
+      } 
       return;
     }
   

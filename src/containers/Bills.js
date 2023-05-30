@@ -26,29 +26,33 @@ export default class {
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
     $('#modaleFile').modal('show')
   }
-
+  
   getBills = () => {
     if (this.store) {
       return this.store
       .bills()
       .list()
       .then(snapshot => {
-        let bills = snapshot
-        bills.sort((a, b) => {
-          return new Date(a.date) - new Date(b.date)
-        })
-        bills=bills
+        const bills = snapshot
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
           .map(doc => {
             try {
-              return { ...doc, date: formatDate(doc.date), status: formatStatus(doc.status) }
+              return {
+                ...doc,
+                date: formatDate(doc.date),
+                status: formatStatus(doc.status)
+              }
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
               console.log(e,'for',doc)
-              return { ...doc, date: formatDate(doc.date), status: formatStatus(doc.status) }
+              return {
+                ...doc,
+                date: doc.date,
+                status: formatStatus(doc.status)
+              }
             }
           })
-          
           console.log('length', bills.length)
         return bills
       })

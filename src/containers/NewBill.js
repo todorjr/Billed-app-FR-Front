@@ -20,20 +20,37 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    const fileExtension = fileName.split('.').pop();
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+
+    const parentElement = e.target.parentNode;
+    // Remove existing validation message, if any
+    const existingMessage = parentElement.querySelector('.file-type-info');
+    if (existingMessage) {
+        parentElement.removeChild(existingMessage);
+    }
 
     if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-      if (['pdf'].includes(fileExtension)) {
-        // Create text under the element indicating it's a PDF file
-        const textElement = document.createElement('p');
-        textElement.textContent = 'This is a PDF file.';
+        let textElement = document.createElement('p');
+        if (['pdf'].includes(fileExtension)) {
+            // Create text under the element indicating it's a PDF file
+            textElement.textContent = 'This file is not supported, please upload a JPG, JPEG or PNG file.';
+            textElement.style.color = 'red';
+        } else {
+            textElement.textContent = 'Unknown file type, please upload a JPG, JPEG or PNG file.';
+            textElement.style.color = 'red';
+        }
         textElement.classList.add('file-type-info');
-        textElement.style.color = 'red';
-        e.target.parentNode.appendChild(textElement);
-      } 
-      return;
+        parentElement.appendChild(textElement);
+        return;
+    } else {
+        // Show the successful message if the file type is jpg, jpeg, or png
+        const successElement = document.createElement('p');
+        successElement.textContent = `${fileName} uploaded successfully.`;
+        successElement.style.color = 'green';
+        successElement.classList.add('file-type-info');
+        parentElement.appendChild(successElement);
     }
-  
+
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
@@ -54,6 +71,7 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)

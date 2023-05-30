@@ -22,7 +22,7 @@ const row = (bill) => {
   const rows = (data) => {
     return (data && data.length)
       ? data
-        .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort in ascending order
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
         .map(bill => row(bill))
         .join("") 
       : ""

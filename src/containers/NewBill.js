@@ -41,6 +41,9 @@ export default class NewBill {
         }
         textElement.classList.add('file-type-info');
         parentElement.appendChild(textElement);
+         // Emit custom event for rejected file
+          const fileRejectedEvent = new CustomEvent('fileRejected');
+          parentElement.dispatchEvent(fileRejectedEvent);
         return;
     } else {
         // Show the successful message if the file type is jpg, jpeg, or png
@@ -49,6 +52,9 @@ export default class NewBill {
         successElement.style.color = 'green';
         successElement.classList.add('file-type-info');
         parentElement.appendChild(successElement);
+          // Emit custom event for accepted file
+    const fileAcceptedEvent = new CustomEvent('fileAccepted', { detail: { fileName } });
+    parentElement.dispatchEvent(fileAcceptedEvent);
     }
 
     const formData = new FormData()

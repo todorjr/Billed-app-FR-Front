@@ -139,17 +139,22 @@ export default class {
       statusBillsContainer.html(cards(filteredBills(bills, getStatus(index))));
     } else {
       arrowIcon.css({ transform: 'rotate(90deg)' });
-      statusBillsContainer.html("");
+      statusBillsContainer.empty();
     }
+  
+    const handleEditTicket = (bill) => {
+      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills));
+    };
   
     statusBillsContainer.find('.bill-card').each((_, element) => {
       const billId = element.id.replace('open-bill', '');
       const bill = bills.find(b => b.id === billId);
-      $(`#${element.id}`).click((e) => this.handleEditTicket(e, bill, bills));
+      handleEditTicket(bill);
     });
   
     return bills;
   }
+  
   
 
   getBillsAllUsers = () => {

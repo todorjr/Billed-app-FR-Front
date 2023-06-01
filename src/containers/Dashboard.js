@@ -131,28 +131,26 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    const arrowIcon = $(`#arrow-icon${index}`);
-    const statusBillsContainer = $(`#status-bills-container${index}`);
-  
-    if (statusBillsContainer.html() === "") {
-      arrowIcon.css({ transform: 'rotate(0deg)' });
-      statusBillsContainer.html(cards(filteredBills(bills, getStatus(index))));
+    if (this.counter === undefined || this.index !== index) this.counter = 0
+    if (this.index === undefined || this.index !== index) this.index = index
+    if (this.counter % 2 === 0) {
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
+      $(`#status-bills-container${this.index}`)
+        .html(cards(filteredBills(bills, getStatus(this.index))))
+      this.counter ++
     } else {
-      arrowIcon.css({ transform: 'rotate(90deg)' });
-      statusBillsContainer.empty();
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
+      $(`#status-bills-container${this.index}`)
+        .html("")
+      this.counter ++
     }
-  
-    const handleEditTicket = (bill) => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills));
-    };
-  
-    statusBillsContainer.find('.bill-card').each((_, element) => {
-      const billId = element.id.replace('open-bill', '');
-      const bill = bills.find(b => b.id === billId);
-      handleEditTicket(bill);
-    });
-  
-    return bills;
+
+    bills.forEach(bill => {
+      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+    })
+
+    return bills
+
   }
   
   

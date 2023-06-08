@@ -60,53 +60,53 @@ describe("Given I am connected as an employee", () => {
             })
         })
         test("Then the bill should be updated and I should navigate to Bills", () => {
-          const html = document.createElement('div')
-          html.innerHTML = `
-              <form data-testid="form-new-bill">
-                  <select data-testid="expense-type">
-                      <option value="type1">Type1</option>
-                      <option value="type2">Type2</option>
-                  </select>
-                  <input data-testid="expense-name" type="text" />
-                  <input data-testid="amount" type="number" />
-                  <input data-testid="datepicker" type="date" />
-                  <input data-testid="vat" type="text" />
-                  <input data-testid="pct" type="number" />
-                  <textarea data-testid="commentary"></textarea>
-                  <input data-testid="file" type="file" />
-                  <button type="submit">Submit</button>
-              </form>
-          `
-          document.body.innerHTML = html.outerHTML
-          window.localStorage.setItem('user', JSON.stringify({ email: 'test@email.com' }))
-          const onNavigate = jest.fn()
-          const localStorage = window.localStorage
-          const firestore = null
-          const newBill = new NewBill({
-              document,
-              onNavigate,
-              firestore,
-              localStorage
-          })
-          const handleSubmit = jest.fn(newBill.handleSubmit)
-          const formNewBill = document.querySelector(`form[data-testid="form-new-bill"]`)
-          formNewBill.addEventListener("submit", handleSubmit)
-          newBill.updateBill = jest.fn()
+            const html = document.createElement('div')
+            html.innerHTML = `
+            <form data-testid="form-new-bill">
+                <select data-testid="expense-type">
+                    <option value="type1">Type1</option>
+                    <option value="type2">Type2</option>
+                </select>
+                <input data-testid="expense-name" type="text" />
+                <input data-testid="amount" type="number" />
+                <input data-testid="datepicker" type="date" />
+                <input data-testid="vat" type="text" />
+                <input data-testid="pct" type="number" />
+                <textarea data-testid="commentary"></textarea>
+                <input data-testid="file" type="file" />
+                <button type="submit">Submit</button>
+            </form>
+        `
+            document.body.innerHTML = html.outerHTML
+            window.localStorage.setItem('user', JSON.stringify({ email: 'test@email.com' }))
+            const onNavigate = jest.fn()
+            const localStorage = window.localStorage
+            const firestore = null
+            const newBill = new NewBill({
+                document,
+                onNavigate,
+                firestore,
+                localStorage
+            })
+            const handleSubmit = jest.fn(newBill.handleSubmit)
+            const formNewBill = document.querySelector(`form[data-testid="form-new-bill"]`)
+            formNewBill.addEventListener("submit", handleSubmit)
+            newBill.updateBill = jest.fn()
 
-          // Set form values
-          formNewBill.querySelector(`input[data-testid="expense-name"]`).value = 'Test Expense'
-          formNewBill.querySelector(`input[data-testid="amount"]`).value = '123'
-          formNewBill.querySelector(`input[data-testid="datepicker"]`).value = '2023-05-30'
-          formNewBill.querySelector(`input[data-testid="vat"]`).value = '20'
-          formNewBill.querySelector(`input[data-testid="pct"]`).value = '20'
-          formNewBill.querySelector(`textarea[data-testid="commentary"]`).value = 'Test commentary'
+            // Set form values
+            formNewBill.querySelector(`input[data-testid="expense-name"]`).value = 'Test Expense'
+            formNewBill.querySelector(`input[data-testid="amount"]`).value = '123'
+            formNewBill.querySelector(`input[data-testid="datepicker"]`).value = '2023-05-30'
+            formNewBill.querySelector(`input[data-testid="vat"]`).value = '20'
+            formNewBill.querySelector(`input[data-testid="pct"]`).value = '20'
+            formNewBill.querySelector(`textarea[data-testid="commentary"]`).value = 'Test commentary'
 
-          // Simulate form submission
-          fireEvent.submit(formNewBill)
+            // Simulate form submission
+            fireEvent.submit(formNewBill)
 
-          expect(newBill.updateBill).toHaveBeenCalled()
-          expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills'])
-      })
+            expect(newBill.updateBill).toHaveBeenCalled()
+            expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills'])
+        })
     })
 })
 

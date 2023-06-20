@@ -2,11 +2,19 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import {fireEvent, screen, waitFor} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
+import { JSDOM } from "jsdom";
+import Bills from "../containers/Bills.js";
+import { formatDate, formatStatus } from "../app/format.js";
+
+jest.mock("../app/format.js", () => ({
+  formatDate: jest.fn((date) => `formatted_date_${date}`),
+  formatStatus: jest.fn((status) => `formatted_status_${status}`),
+}));
 
 import router from "../app/Router.js";
 
@@ -36,6 +44,57 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
-    
-  })
+    test('Then it should call handleClickIconEye when iconEye is clicked', () => {
+      // creating dom element
+      const domElement = new JSDOM(`<!DOCTYPE html><div data-testid="icon-eye"></div>`);
+      const { document } = domElement.window;
+  
+      // Mock onNavigate function, store and localStorage for Bills constructor
+      const onNavigate = jest.fn();
+      const store = { bills: () => ({ list: () => Promise.resolve([]) }) };
+      const localStorage = window.localStorage;
+  
+      // Create instance of Bills
+      const billsInstance = new Bills({
+        document,
+        onNavigate,
+        store,
+        localStorage
+      });
+      // we are watching handleClickIconEye function
+      const handleClickIconEyeSpy = jest.spyOn(billsInstance, 'handleClickIconEye');
+
+      // simulate click event on the iconEye
+      const iconEye = document.querySelector('div[data-testid="icon-eye"]');
+      fireEvent.click(iconEye);
+
+      // sssert that handleClickIconEye was called
+      expect(handleClickIconEyeSpy).toHaveBeenCalled();
+    });
+    test('Then it should navigate to new bill page when new bill button is clicked', () => {
+      // Setup a simple DOM
+      const dom = new JSDOM(`<!DOCTYPE html><button data-testid="btn-new-bill"></button>`);
+      const { document } = dom.window;
+  
+      // Mock onNavigate function, store and localStorage for Bills constructor
+      const onNavigate = jest.fn();
+      const store = { bills: () => ({ list: () => Promise.resolve([]) }) };
+      const localStorage = window.localStorage;
+  
+      // Create instance of Bills
+      const billsInstance = new Bills({
+        document,
+        onNavigate,
+        store,
+        localStorage
+      });
+
+      // Simulate click event on the new bill button
+      const newBillButton = document.querySelector('button[data-testid="btn-new-bill"]');
+      newBillButton.click(); // Here we use the built-in click method
+
+      // Assert that onNavigate was called with the right path
+      expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill']);
+    });
+  });
 })

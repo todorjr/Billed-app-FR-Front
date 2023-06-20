@@ -101,13 +101,45 @@ describe("Given I am connected as an employee", () => {
             formNewBill.querySelector(`input[data-testid="pct"]`).value = '20'
             formNewBill.querySelector(`textarea[data-testid="commentary"]`).value = 'Test commentary'
 
+            // Set form values
+            formNewBill.querySelector(`select[data-testid="expense-type"]`).value = 'type1';
+            formNewBill.querySelector(`input[data-testid="expense-name"]`).value = 'Test Expense';
+            formNewBill.querySelector(`input[data-testid="amount"]`).value = '123';
+            formNewBill.querySelector(`input[data-testid="datepicker"]`).value = '2023-05-30';
+            formNewBill.querySelector(`input[data-testid="vat"]`).value = '20';
+            formNewBill.querySelector(`input[data-testid="pct"]`).value = '20';
+            formNewBill.querySelector(`textarea[data-testid="commentary"]`).value = 'Test commentary';
+
+            // Set file-related properties of the NewBill instance
+            newBill.fileUrl = 'http://example.com/test.jpeg';
+            newBill.fileName = 'test.jpeg';
+
+            // Simulate form submission
+            fireEvent.submit(formNewBill)
+
+            // Verify that updateBill was called with the correct bill object
+            const expectedBill = {
+                email: 'test@email.com',
+                type: 'type1',
+                name: 'Test Expense',
+                amount: 123,
+                date: '2023-05-30',
+                vat: '20',
+                pct: 20,
+                commentary: 'Test commentary',
+                fileUrl: 'http://example.com/test.jpeg',
+                fileName: 'test.jpeg',
+                status: 'pending',
+            };
+
             // Simulate form submission
             fireEvent.submit(formNewBill)
 
             expect(newBill.updateBill).toHaveBeenCalled()
             expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills'])
+            expect(newBill.updateBill).toHaveBeenCalledWith(expectedBill);
+            // Verify that the user was redirected to the Bills page
+            expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills']);
         })
     })
 })
-
-

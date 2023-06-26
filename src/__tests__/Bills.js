@@ -48,7 +48,7 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
-    test('Then it should call handleClickIconEye when iconEye is clicked', () => {
+    test("Then it should call handleClickIconEye when iconEye is clicked", () => {
       // creating dom element
       const domElement = new JSDOM(`<!DOCTYPE html><div data-testid="icon-eye"></div>`);
       const { document } = domElement.window;
@@ -75,7 +75,7 @@ describe("Given I am connected as an employee", () => {
       // sssert that handleClickIconEye was called
       expect(handleClickIconEyeSpy).toHaveBeenCalled();
     });
-    test('Then it should navigate to new bill page when new bill button is clicked', () => {
+    test("Then it should navigate to new bill page when new bill button is clicked", () => {
       // Setup a simple DOM
       const dom = new JSDOM(`<!DOCTYPE html><button data-testid="btn-new-bill"></button>`);
       const { document } = dom.window;
@@ -153,7 +153,6 @@ describe("Given I am connected as an employee", () => {
       document.body.appendChild(root)
       router()
     })
-
     test("It should correctly handle a 404 error from the API", async () => {
 
       mockStore.bills.mockImplementationOnce(() => {
@@ -179,7 +178,6 @@ describe("Given I am connected as an employee", () => {
 
       expect(mockStore.bills).toHaveBeenCalled()
     })
-
     test("It should correctly handle a 500 error from the API", async () => {
 
       mockStore.bills.mockImplementationOnce(() => {

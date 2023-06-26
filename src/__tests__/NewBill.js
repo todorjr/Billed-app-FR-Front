@@ -8,57 +8,139 @@ import NewBill from "../containers/NewBill.js"
 import { fireEvent } from '@testing-library/dom'
 import { ROUTES_PATH } from '../constants/routes.js'
 
+   // Helper function to setup the test environment
+// function setupTestEnvironment() {
+//     const html = document.createElement('div');
+//     html.innerHTML = `
+// <form data-testid="form-new-bill">
+//     <input data-testid="file" type="file" />
+// </form>
+// `;
+//     document.body.innerHTML = html.outerHTML;
+//     const onNavigate = jest.fn();
+//     const localStorage = window.localStorage;
+//     const firestore = null;
+//     const newBill = new NewBill({
+//         document,
+//         onNavigate,
+//         firestore,
+//         localStorage
+//     });
+//     const handleChangeFile = jest.fn(newBill.handleChangeFile);
+//     const file = document.querySelector(`input[data-testid="file"]`);
+//     file.addEventListener('change', handleChangeFile);
+
+//     return { file, handleChangeFile };
+// }
+
 describe("Given I am connected as an employee", () => {
     describe("When I am on NewBill Page", () => {
-        test("Then only jpg, jpeg and png file extensions should be accepted", () => {
-            const html = document.createElement('div')
+        test("Then only jpg, jpeg and png file extensions should be accepted, and PDF file should be rejected", () => {
+            const html = document.createElement('div');
             html.innerHTML = `
                 <form data-testid="form-new-bill">
-                    <input data-testid="file" type="file" />
+                <input data-testid="file" type="file" />
                 </form>
-            `
-            document.body.innerHTML = html.outerHTML
-            const onNavigate = jest.fn()
-            const localStorage = window.localStorage
-            const firestore = null
+            `;
+            document.body.innerHTML = html.outerHTML;
+            const onNavigate = jest.fn();
+            const localStorage = window.localStorage;
+            const firestore = null;
             const newBill = new NewBill({
                 document,
                 onNavigate,
                 firestore,
                 localStorage
-            })
-            const handleChangeFile = jest.fn(newBill.handleChangeFile)
-            const file = document.querySelector(`input[data-testid="file"]`)
-            file.addEventListener('change', handleChangeFile)
+            });
+            const handleChangeFile = jest.fn(newBill.handleChangeFile);
+            const file = document.querySelector(`input[data-testid="file"]`);
+            file.addEventListener('change', handleChangeFile);
 
             // Simulate change event for jpeg file
-            const jpegFile = new File(['content'], 'test.jpeg', { type: 'image/jpeg' })
+            const jpegFile = new File(['content'], 'test.jpeg', { type: 'image/jpeg' });
             fireEvent.change(file, {
                 target: {
                     files: [jpegFile],
                 },
-            })
+            });
+
             file.addEventListener('fileAccepted', (e) => {
-                expect(e.detail.fileName).toBe('test.jpeg')
-            })
+                expect(e.detail.fileName).toBe('test.jpeg');
+                const successMessage = document.querySelector('.file-type-info');
+                expect(successMessage.textContent).toBe('test.jpeg uploaded successfully.');
+                expect(successMessage.style.color).toBe('green');
+            });
+
             file.addEventListener('fileRejected', () => {
-                throw new Error("jpeg file was rejected")
-            })
+                throw new Error("jpeg file was rejected");
+            });
+
+            // Simulate change event for png file
+            const pngFile = new File(['content'], 'test.png', { type: 'image/png' });
+            fireEvent.change(file, {
+                target: {
+                    files: [pngFile],
+                },
+            });
+            file.addEventListener('fileAccepted', (e) => {
+                expect(e.detail.fileName).toBe('test.png');
+                const successMessage = document.querySelector('.file-type-info');
+                expect(successMessage.textContent).toBe('test.png uploaded successfully.');
+                expect(successMessage.style.color).toBe('green');
+            });
+            file.addEventListener('fileRejected', () => {
+                throw new Error("png file was rejected");
+            });
+
+            // Simulate change event for jpg file
+            const jpgFile = new File(['content'], 'test.jpg', { type: 'image/jpg' });
+            fireEvent.change(file, {
+                target: {
+                    files: [jpgFile],
+                },
+            });
+            file.addEventListener('fileAccepted', (e) => {
+                expect(e.detail.fileName).toBe('test.jpg');
+                const successMessage = document.querySelector('.file-type-info');
+                expect(successMessage.textContent).toBe('test.jpg uploaded successfully.');
+                expect(successMessage.style.color).toBe('green');
+            });
+            file.addEventListener('fileRejected', () => {
+                throw new Error("jpg file was rejected");
+            });
 
             // Simulate change event for pdf file
-            const pdfFile = new File(['content'], 'test.pdf', { type: 'application/pdf' })
+            const pdfFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
             fireEvent.change(file, {
                 target: {
                     files: [pdfFile],
                 },
-            })
+            });
             file.addEventListener('fileRejected', () => {
-                expect(true).toBe(true) // Passed if 'fileRejected' is fired
-            })
+                const errorMessage = document.querySelector('.file-type-info');
+                expect(errorMessage.textContent).toBe('This file is not supported, please upload a JPG, JPEG or PNG file.');
+                expect(errorMessage.style.color).toBe('red');
+            });
+
             file.addEventListener('fileAccepted', (e) => {
-                throw new Error("pdf file was accepted")
-            })
-        })
+                throw new Error("pdf file was accepted");
+            });
+
+            // Simulate change event for accepted files]
+            fireEvent.change(file, {
+                target: {
+                    files: [jpegFile, pngFile, jpgFile],
+                },
+            });
+            file.addEventListener('fileAccepted', (e) => {
+                expect(e.detail.fileName).toBe('test.jpg');
+                const successMessage = document.querySelector('.file-type-info');
+                expect(successMessage.textContent).toBe('test.jpg uploaded successfully.');
+                expect(successMessage.style.color).toBe('green');
+            });
+
+        });
+
         test("Then the bill should be updated and I should navigate to Bills", () => {
             const html = document.createElement('div')
             html.innerHTML = `

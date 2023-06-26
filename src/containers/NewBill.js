@@ -31,14 +31,17 @@ export default class NewBill {
 
     if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
         let textElement = document.createElement('p');
-        if (['pdf'].includes(fileExtension)) {
-            // Create text under the element indicating it's a PDF file
-            textElement.textContent = 'This file is not supported, please upload a JPG, JPEG or PNG file.';
-            textElement.style.color = 'red';
-        } else {
-            textElement.textContent = 'Unknown file type, please upload a JPG, JPEG or PNG file.';
-            textElement.style.color = 'red';
-        }
+        if (fileExtension === 'pdf') {
+          let textElement = document.createElement('p');
+          textElement.textContent = 'This file is not supported, please upload a JPG, JPEG or PNG file.';
+          textElement.style.color = 'red';
+          textElement.classList.add('file-type-info');
+          parentElement.appendChild(textElement);
+           // Emit custom event for rejected file
+          const fileRejectedEvent = new CustomEvent('fileRejected');
+          parentElement.dispatchEvent(fileRejectedEvent);
+          return;
+      }
         textElement.classList.add('file-type-info');
         parentElement.appendChild(textElement);
          // Emit custom event for rejected file

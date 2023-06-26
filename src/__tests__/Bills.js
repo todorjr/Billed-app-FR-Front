@@ -10,13 +10,17 @@ import {localStorageMock} from "../__mocks__/localStorage.js";
 import { JSDOM } from "jsdom";
 import Bills from "../containers/Bills.js";
 import { formatDate, formatStatus } from "../app/format.js";
+import router from "../app/Router.js";
 
 jest.mock("../app/format.js", () => ({
   formatDate: jest.fn((date) => `formatted_date_${date}`),
   formatStatus: jest.fn((status) => `formatted_status_${status}`),
 }));
 
-import router from "../app/Router.js";
+const mockStore = {
+  bills: jest.fn().mockReturnThis(),
+  list: jest.fn().mockResolvedValueOnce(bills)
+}
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -132,6 +136,76 @@ describe("Given I am connected as an employee", () => {
       expect(result).toBeUndefined()
     })
   });
+  describe("When getBills is called", () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, "bills")
+      Object.defineProperty(
+          window,
+          'localStorage',
+          { value: localStorageMock }
+      )
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee',
+        email: "a@a"
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.appendChild(root)
+      router()
+    })
+
+    test("It should correctly handle a 404 error from the API", async () => {
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () =>  {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+        }
+      })
+
+      const billInstance = new Bills({
+        document, onNavigate, firestore: null, localStorage: window.localStorage, 
+        onGetUserId: () => Promise.resolve('a1b2c3d4e5')
+      })
+
+      billInstance.store = mockStore
+
+      try {
+        await billInstance.getBills()
+      } catch (e) {
+        expect(e.message).toBe("Erreur 404")
+      }
+
+      expect(mockStore.bills).toHaveBeenCalled()
+    })
+
+    test("It should correctly handle a 500 error from the API", async () => {
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () =>  {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }
+      })
+
+      const billInstance = new Bills({
+        document, onNavigate, firestore: null, localStorage: window.localStorage, 
+        onGetUserId: () => Promise.resolve('a1b2c3d4e5')
+      })
+
+      billInstance.store = mockStore
+
+      try {
+        await billInstance.getBills()
+      } catch (e) {
+        expect(e.message).toBe("Erreur 500")
+      }
+
+      expect(mockStore.bills).toHaveBeenCalled()
+    })
+  })
 })
 
 

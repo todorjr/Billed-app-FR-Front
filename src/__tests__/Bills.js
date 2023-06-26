@@ -96,5 +96,45 @@ describe("Given I am connected as an employee", () => {
       // Assert that onNavigate was called with the right path
       expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill']);
     });
+    test("Then getBills should return a sorted list of formatted bills when store is defined", async () => {
+      const storeMock = {
+        bills: jest.fn().mockReturnThis(),
+        list: jest.fn().mockResolvedValueOnce(bills)
+      }
+
+      const billInstance = new Bills({
+        document, onNavigate, firestore: null, localStorage: window.localStorage, 
+        onGetUserId: () => Promise.resolve('a1b2c3d4e5')
+      })
+
+      billInstance.store = storeMock
+
+      const result = await billInstance.getBills()
+
+      expect(storeMock.bills).toHaveBeenCalled()
+      expect(storeMock.list).toHaveBeenCalled()
+      expect(formatDate).toHaveBeenCalledTimes(bills.length)
+      expect(formatStatus).toHaveBeenCalledTimes(bills.length)
+      
+      result.forEach((bill, i) => {
+        expect(bill.date).toBe(`formatted_date_${bills[i].date}`)
+        expect(bill.status).toBe(`formatted_status_${bills[i].status}`)
+      })
+    })
+    test("Then getBills should return undefined when store is undefined", async () => {
+      const billInstance = new Bills({
+        document, onNavigate, firestore: null, localStorage: window.localStorage, 
+        onGetUserId: () => Promise.resolve('a1b2c3d4e5')
+      })
+
+      const result = await billInstance.getBills()
+
+      expect(result).toBeUndefined()
+    })
   });
 })
+
+
+// These tests check if:
+// When the store exists, getBills returns a sorted list of bills, and the formatDate and formatStatus functions are called and correctly used for each bill
+// When the store is not defined, getBills returns undefined

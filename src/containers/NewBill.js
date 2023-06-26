@@ -17,9 +17,8 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
+    const file = e.target.files[0]
+    const fileName = file.name
     const fileExtension = fileName.split('.').pop().toLowerCase();
 
     const parentElement = e.target.parentNode;
@@ -28,8 +27,22 @@ export default class NewBill {
     if (existingMessage) {
         parentElement.removeChild(existingMessage);
     }
+    console.log('file', file.type, '\nfileExtension', fileExtension)
+    if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+      
+      console.log('OK')
+        // Show the successful message if the file type is jpg, jpeg, or png
+        const successElement = document.createElement('p');
+        successElement.textContent = `${fileName} uploaded successfully.`;
+        successElement.style.color = 'green';
+        successElement.classList.add('file-type-info');
+        parentElement.appendChild(successElement);
+          // Emit custom event for accepted file
+    const fileAcceptedEvent = new CustomEvent('fileAccepted', { detail: { fileName } });
+    parentElement.dispatchEvent(fileAcceptedEvent);
+    } else {
 
-    if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+      console.log('KO')
         let textElement = document.createElement('p');
         if (fileExtension === 'pdf') {
           let textElement = document.createElement('p');
@@ -48,16 +61,7 @@ export default class NewBill {
           const fileRejectedEvent = new CustomEvent('fileRejected');
           parentElement.dispatchEvent(fileRejectedEvent);
         return;
-    } else {
-        // Show the successful message if the file type is jpg, jpeg, or png
-        const successElement = document.createElement('p');
-        successElement.textContent = `${fileName} uploaded successfully.`;
-        successElement.style.color = 'green';
-        successElement.classList.add('file-type-info');
-        parentElement.appendChild(successElement);
-          // Emit custom event for accepted file
-    const fileAcceptedEvent = new CustomEvent('fileAccepted', { detail: { fileName } });
-    parentElement.dispatchEvent(fileAcceptedEvent);
+        
     }
 
     const formData = new FormData()

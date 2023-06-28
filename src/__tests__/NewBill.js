@@ -11,7 +11,9 @@ import { ROUTES_PATH } from '../constants/routes.js'
 
 describe("Given I am connected as an employee", () => {
     describe("When I am on NewBill Page", () => {
+        //Through this test, I'm validating that my application correctly handles the file upload process, accepting only the desired file formats and providing user feedback accordingly. This helps ensure a positive and intuitive user experience while avoiding potential issues with unsupported file types.
         test("Then only jpg, jpeg and png file extensions should be accepted, and PDF file should be rejected", () => {
+            //set up a mock HTML structure that replicates the NewBill form that an employee would interact with, including an input field for a file.
             const html = document.createElement('div');
             html.innerHTML = `
                 <form data-testid="form-new-bill">
@@ -19,6 +21,8 @@ describe("Given I am connected as an employee", () => {
                 </form>
             `;
             document.body.innerHTML = html.outerHTML;
+
+            //initial conditions and variables, including a mock user in localStorage, a null Firestore database, and a mock store that returns a resolved promise.
             const onNavigate = jest.fn();
             const localStorage = window.localStorage;
             localStorage.setItem("user", JSON.stringify({type: 'Admin', email: 'test@test.fr'}))
@@ -27,17 +31,20 @@ describe("Given I am connected as an employee", () => {
                 list: () => Promise.resolve([]),
                 create: () => Promise.resolve(true)
             }) };
-            const newBill = new NewBill({
+
+            const newBill = new NewBill({ //new instance of the NewBill class and pass it your mocked values, including the document with your mock HTML.
                 document,
                 onNavigate,
                 store,
                 localStorage
             });
+
+            //mock function for handleChangeFile and attach it to the 'change' event listener on the file input field.
             const handleChangeFile = jest.fn(newBill.handleChangeFile);
             const file = document.querySelector(`input[data-testid="file"]`);
             file.addEventListener('change', handleChangeFile);
 
-            // Simulate change event for jpg file
+            // Simulate change event for jpg file and testing for jpg file extension acceptance: I simulate a 'change' event on the file input field with a jpg file, then check if the handleChangeFile function was called. I also ensure that the displayed message and color are correct for a successful jpg file upload.
             const jpgFile = new File(['content'], 'test.jpg', { type: 'image/jpg' });
 
             fireEvent.change(file, {
